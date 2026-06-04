@@ -1,0 +1,526 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>HMI Flow — Sanjutha R</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{--black:#0a0a0a;--white:#f5f2ec;--accent:#d4f06e;--teal:#6efadb;--border:rgba(255,255,255,0.08)}
+html{scroll-behavior:smooth}
+body{background:var(--black);color:var(--white);font-family:'DM Sans',sans-serif;min-height:100vh;overflow-x:hidden}
+
+nav{position:fixed;top:0;left:0;right:0;z-index:100;display:flex;align-items:center;justify-content:space-between;padding:1.25rem 4rem;background:rgba(10,10,10,0.92);backdrop-filter:blur(12px);border-bottom:1px solid var(--border)}
+.nav-logo{font-family:'Syne',sans-serif;font-weight:800;font-size:1.1rem;color:var(--white);text-decoration:none}
+.nav-logo span{color:var(--accent)}
+.back-btn{display:inline-flex;align-items:center;gap:6px;color:rgba(245,242,236,0.5);text-decoration:none;font-size:0.85rem;transition:color 0.2s}
+.back-btn:hover{color:var(--accent)}
+
+.hero{padding:7rem 4rem 3rem;border-bottom:1px solid var(--border)}
+.section-label{font-size:0.72rem;font-weight:500;letter-spacing:0.16em;text-transform:uppercase;color:var(--accent);margin-bottom:1rem}
+h1{font-family:'Syne',sans-serif;font-size:clamp(2rem,5vw,3.5rem);font-weight:800;letter-spacing:-0.04em;line-height:1.1}
+h1 span{color:rgba(245,242,236,0.25)}
+.hero-sub{margin-top:1rem;color:rgba(245,242,236,0.45);font-weight:300;max-width:520px;font-size:1rem}
+
+/* FLOW NAV */
+.flow-nav{display:flex;align-items:center;gap:0;padding:2rem 4rem 0;overflow-x:auto;scrollbar-width:none}
+.flow-nav::-webkit-scrollbar{display:none}
+.fnav-item{display:flex;align-items:center;gap:0;flex-shrink:0}
+.fnav-btn{display:flex;flex-direction:column;align-items:center;gap:4px;padding:10px 16px;border-radius:12px;border:none;background:transparent;cursor:pointer;transition:all 0.2s}
+.fnav-btn.active{background:rgba(212,240,110,0.08);border:1px solid rgba(212,240,110,0.2)}
+.fnav-num{font-family:'Syne',sans-serif;font-size:10px;font-weight:700;color:rgba(255,255,255,0.2)}
+.fnav-btn.active .fnav-num{color:var(--accent)}
+.fnav-lbl{font-size:11px;color:rgba(255,255,255,0.35);white-space:nowrap;font-family:'DM Sans',sans-serif}
+.fnav-btn.active .fnav-lbl{color:var(--white)}
+.fnav-arrow{color:rgba(255,255,255,0.12);font-size:14px;padding:0 4px}
+
+/* SCREEN AREA */
+.screen-area{padding:2rem 4rem 4rem;display:flex;gap:4rem;align-items:flex-start;flex-wrap:wrap}
+.device-frame{flex-shrink:0;position:relative}
+.device{width:340px;background:#0d0d1a;border-radius:24px;padding:28px 24px;border:1px solid rgba(110,250,219,0.1);min-height:520px;display:flex;flex-direction:column;transition:border-color 0.4s}
+.screen-info{flex:1;min-width:280px;padding-top:1rem}
+.screen-info h2{font-family:'Syne',sans-serif;font-size:1.8rem;font-weight:800;letter-spacing:-0.03em;margin-bottom:0.75rem}
+.screen-info p{color:rgba(245,242,236,0.5);font-weight:300;font-size:0.95rem;line-height:1.8;margin-bottom:1.5rem}
+.info-tags{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:2rem}
+.info-tag{background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:100px;padding:4px 14px;font-size:0.78rem;color:rgba(245,242,236,0.5)}
+
+.nav-btns{display:flex;gap:1rem;margin-top:2rem}
+.nav-btn{display:inline-flex;align-items:center;gap:8px;padding:0.8rem 1.8rem;border-radius:100px;font-size:0.88rem;font-weight:500;cursor:pointer;transition:all 0.2s;border:none;font-family:'DM Sans',sans-serif}
+.btn-next{background:var(--accent);color:var(--black)}
+.btn-next:hover{background:#c8e860;transform:translateY(-2px)}
+.btn-prev{background:transparent;color:var(--white);border:1px solid rgba(255,255,255,0.15)}
+.btn-prev:hover{border-color:var(--accent);color:var(--accent)}
+
+/* SHARED HMI COMPONENTS */
+.topbar{display:flex;justify-content:space-between;align-items:center;margin-bottom:18px}
+.tag{font-size:10px;letter-spacing:0.12em;text-transform:uppercase;font-family:'DM Sans',sans-serif}
+.tag-teal{color:rgba(110,250,219,0.65)}
+.tag-yellow{color:rgba(212,240,110,0.65)}
+.tag-orange{color:rgba(255,160,80,0.65)}
+.tag-purple{color:rgba(180,130,255,0.65)}
+.tag-red{color:rgba(255,100,100,0.65)}
+.clock{font-size:11px;color:rgba(255,255,255,0.25);font-family:'DM Sans',sans-serif}
+
+.cols3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px}
+.cols2{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.stat{background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.05);border-radius:8px;padding:9px 6px;text-align:center}
+.sv{font-family:'Syne',sans-serif;font-size:13px;font-weight:700;color:#fff;display:block}
+.sl{font-size:9px;color:rgba(255,255,255,0.3);display:block;margin-top:2px;font-family:'DM Sans',sans-serif}
+.ac .sv{color:var(--teal)!important}
+.ay .sv{color:var(--accent)!important}
+
+.divider{height:1px;background:rgba(255,255,255,0.05);margin:12px 0}
+.pill{display:inline-flex;align-items:center;gap:5px;border-radius:100px;padding:5px 14px;font-size:10px;font-family:'DM Sans',sans-serif;letter-spacing:0.06em}
+.pill-teal{background:rgba(110,250,219,0.07);border:1px solid rgba(110,250,219,0.2);color:var(--teal)}
+.pill-yellow{background:rgba(212,240,110,0.07);border:1px solid rgba(212,240,110,0.2);color:var(--accent)}
+.pdot{width:5px;height:5px;border-radius:50%;animation:dotP 1s infinite}
+.pdot-teal{background:var(--teal)}
+.pdot-yellow{background:var(--accent)}
+@keyframes dotP{0%,100%{opacity:1}50%{opacity:0.2}}
+
+.prog-track{height:3px;background:rgba(255,255,255,0.07);border-radius:100px;overflow:hidden;margin-bottom:12px}
+.prog-fill{height:100%;border-radius:100px;animation:progA 2s ease forwards}
+.prog-teal{background:var(--teal)}
+.prog-yellow{background:var(--accent)}
+@keyframes progA{from{width:0}to{width:var(--w)}}
+
+.bars{display:flex;align-items:center;justify-content:center;gap:4px;margin:10px 0}
+.bar{width:3px;border-radius:100px;background:var(--teal);animation:barA 1s var(--d) infinite ease-in-out;height:var(--h)}
+@keyframes barA{0%,100%{opacity:0.2;transform:scaleY(0.5)}50%{opacity:1;transform:scaleY(1)}}
+
+/* SCREEN STYLES */
+.screen{display:none;flex-direction:column;flex:1}
+.screen.active{display:flex}
+
+/* 1. PASSCODE */
+.auth-icon{width:52px;height:52px;border-radius:50%;background:rgba(212,240,110,0.1);border:1px solid rgba(212,240,110,0.2);display:flex;align-items:center;justify-content:center;margin:0 auto 12px;font-size:22px}
+.auth-title{text-align:center;font-family:'Syne',sans-serif;font-size:1.1rem;font-weight:700;margin-bottom:4px}
+.auth-sub{text-align:center;font-size:11px;color:rgba(255,255,255,0.3);margin-bottom:16px;font-family:'DM Sans',sans-serif}
+.pin-dots{display:flex;justify-content:center;gap:10px;margin-bottom:16px}
+.pindot{width:11px;height:11px;border-radius:50%;border:1px solid rgba(255,255,255,0.2)}
+.pindot.on{background:var(--accent);border-color:var(--accent);animation:pdFill 0.3s ease}
+@keyframes pdFill{from{transform:scale(0)}to{transform:scale(1)}}
+.pin-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:14px}
+.pin-btn{background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.07);border-radius:10px;padding:13px 0;text-align:center;font-family:'Syne',sans-serif;font-size:16px;font-weight:700;color:#fff;cursor:pointer;transition:background 0.15s;user-select:none}
+.pin-btn:active{background:rgba(212,240,110,0.12)}
+
+/* 2. PARKED */
+.park-icon{text-align:center;padding:14px 0}
+.park-big{font-family:'Syne',sans-serif;font-size:3.5rem;font-weight:800;color:var(--teal);animation:parkPulse 2s infinite}
+@keyframes parkPulse{0%,100%{opacity:1}50%{opacity:0.6}}
+.park-lbl{font-size:12px;color:rgba(255,255,255,0.3);letter-spacing:0.1em;text-transform:uppercase;font-family:'DM Sans',sans-serif;margin-top:4px}
+
+/* 3. DRIVE */
+.speed-big{font-family:'Syne',sans-serif;font-size:62px;font-weight:800;line-height:1;animation:spdP 2s infinite ease-in-out}
+@keyframes spdP{0%,100%{opacity:1}50%{opacity:0.85}}
+.speed-unit{font-size:11px;color:rgba(255,255,255,0.3);letter-spacing:0.12em;font-family:'DM Sans',sans-serif;margin-top:2px}
+.mode-pill{display:inline-flex;align-items:center;gap:6px;border-radius:100px;padding:4px 14px;font-size:10px;font-family:'DM Sans',sans-serif;font-weight:500}
+
+/* 4. MODES */
+.mode-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:8px 0}
+.mode-card{border-radius:12px;padding:14px 12px;border:1px solid;cursor:pointer;transition:all 0.2s}
+.mode-card.eco{background:rgba(100,200,100,0.06);border-color:rgba(100,200,100,0.2)}
+.mode-card.normal{background:rgba(110,250,219,0.06);border-color:rgba(110,250,219,0.15)}
+.mode-card.sport{background:rgba(212,240,110,0.06);border-color:rgba(212,240,110,0.2)}
+.mode-card.hyper{background:rgba(255,100,80,0.07);border-color:rgba(255,100,80,0.2)}
+.mode-card.selected{transform:scale(1.03)}
+.mode-card.eco.selected{background:rgba(100,200,100,0.14);border-color:rgba(100,200,100,0.4)}
+.mode-card.normal.selected{background:rgba(110,250,219,0.12);border-color:rgba(110,250,219,0.35)}
+.mode-card.sport.selected{background:rgba(212,240,110,0.12);border-color:rgba(212,240,110,0.4)}
+.mode-card.hyper.selected{background:rgba(255,100,80,0.14);border-color:rgba(255,100,80,0.4)}
+.mode-icon{font-size:18px;margin-bottom:6px}
+.mode-name{font-family:'Syne',sans-serif;font-size:13px;font-weight:700;display:block}
+.mode-name.eco{color:#64c864}
+.mode-name.normal{color:var(--teal)}
+.mode-name.sport{color:var(--accent)}
+.mode-name.hyper{color:#ff6450}
+.mode-desc{font-size:9px;color:rgba(255,255,255,0.3);font-family:'DM Sans',sans-serif;margin-top:2px}
+.mode-bar{height:2px;border-radius:100px;margin-top:8px}
+.mode-bar.eco{background:#64c864}
+.mode-bar.normal{background:var(--teal)}
+.mode-bar.sport{background:var(--accent)}
+.mode-bar.hyper{background:#ff6450}
+
+/* 5. MOODS */
+.mood-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:8px 0}
+.mood-card{border-radius:12px;padding:12px 10px;border:1px solid;cursor:pointer;transition:all 0.2s;text-align:center}
+.mood-card.eclipse{background:rgba(110,250,219,0.05);border-color:rgba(110,250,219,0.15)}
+.mood-card.bolt{background:rgba(212,240,110,0.05);border-color:rgba(212,240,110,0.15)}
+.mood-card.care{background:rgba(255,180,80,0.05);border-color:rgba(255,180,80,0.15)}
+.mood-card.vintage{background:rgba(180,130,255,0.05);border-color:rgba(180,130,255,0.15)}
+.mood-card.bharat{background:rgba(255,100,80,0.05);border-color:rgba(255,100,80,0.15)}
+.mood-card.selected{transform:scale(1.04)}
+.mood-card.eclipse.selected{background:rgba(110,250,219,0.12);border-color:rgba(110,250,219,0.4)}
+.mood-card.bolt.selected{background:rgba(212,240,110,0.12);border-color:rgba(212,240,110,0.4)}
+.mood-card.care.selected{background:rgba(255,180,80,0.12);border-color:rgba(255,180,80,0.4)}
+.mood-card.vintage.selected{background:rgba(180,130,255,0.12);border-color:rgba(180,130,255,0.4)}
+.mood-card.bharat.selected{background:rgba(255,100,80,0.12);border-color:rgba(255,100,80,0.4)}
+.mood-name{font-family:'Syne',sans-serif;font-size:12px;font-weight:700;display:block}
+.mood-name.eclipse{color:var(--teal)}
+.mood-name.bolt{color:var(--accent)}
+.mood-name.care{color:#ffb450}
+.mood-name.vintage{color:#b482ff}
+.mood-name.bharat{color:#ff6450}
+.mood-sub{font-size:9px;color:rgba(255,255,255,0.3);font-family:'DM Sans',sans-serif;margin-top:3px}
+.mood-bar{height:2px;border-radius:100px;margin-top:8px}
+.mood-bar.eclipse{background:var(--teal)}
+.mood-bar.bolt{background:var(--accent)}
+.mood-bar.care{background:#ffb450}
+.mood-bar.vintage{background:#b482ff}
+.mood-bar.bharat{background:#ff6450}
+.bharat-full{grid-column:1/-1}
+.theme-row{display:flex;justify-content:space-between;align-items:center;margin-top:10px}
+.theme-btns{display:flex;gap:6px}
+.theme-opt{border-radius:100px;padding:4px 12px;font-size:10px;font-family:'DM Sans',sans-serif;cursor:pointer;border:1px solid transparent;transition:all 0.2s}
+.theme-opt.on{background:rgba(110,250,219,0.1);border-color:rgba(110,250,219,0.25);color:var(--teal)}
+.theme-opt.off{background:rgba(255,255,255,0.05);color:rgba(255,255,255,0.35)}
+
+/* 6. NAV */
+.map-area{height:120px;border-radius:12px;background:rgba(255,255,255,0.02);overflow:hidden;margin-bottom:12px}
+.nav-dir{display:flex;align-items:center;gap:10px;background:rgba(110,250,219,0.06);border:1px solid rgba(110,250,219,0.12);border-radius:10px;padding:9px 12px;margin-bottom:10px}
+.turn{font-size:22px;color:var(--teal);font-weight:800;font-family:'Syne',sans-serif}
+
+/* PROGRESS DOTS */
+.progress-dots{display:flex;justify-content:center;gap:6px;padding:2rem 4rem 0}
+.pdot-nav{width:6px;height:6px;border-radius:50%;background:rgba(255,255,255,0.12);transition:all 0.3s;cursor:pointer}
+.pdot-nav.on{background:var(--accent);width:20px;border-radius:100px}
+
+footer{padding:2rem 4rem;border-top:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;font-size:0.8rem;color:rgba(245,242,236,0.25)}
+@media(max-width:768px){nav,.hero,.screen-area,.flow-nav,.progress-dots,footer{padding-left:1.5rem;padding-right:1.5rem}.screen-area{flex-direction:column}.device{width:100%}.flow-nav{padding-top:1rem}}
+</style>
+</head>
+<body>
+
+<nav>
+  <a href="index.html" class="nav-logo">S<span>.</span>R</a>
+  <a href="index.html" class="back-btn">&larr; Back to portfolio</a>
+</nav>
+
+<div class="hero">
+  <div class="section-label">Ola Electric · Kanzi HMI · Full Flow</div>
+  <h1>Complete HMI <span>walkthrough</span></h1>
+  <p class="hero-sub">Tap through the full rider journey — from authentication to navigation. 6 screens, one flow.</p>
+</div>
+
+<div class="flow-nav" id="flowNav">
+  <div class="fnav-item"><button class="fnav-btn active" onclick="goTo(0)"><span class="fnav-num">01</span><span class="fnav-lbl">Passcode</span></button><span class="fnav-arrow">›</span></div>
+  <div class="fnav-item"><button class="fnav-btn" onclick="goTo(1)"><span class="fnav-num">02</span><span class="fnav-lbl">Parked</span></button><span class="fnav-arrow">›</span></div>
+  <div class="fnav-item"><button class="fnav-btn" onclick="goTo(2)"><span class="fnav-num">03</span><span class="fnav-lbl">Riding</span></button><span class="fnav-arrow">›</span></div>
+  <div class="fnav-item"><button class="fnav-btn" onclick="goTo(3)"><span class="fnav-num">04</span><span class="fnav-lbl">Ride Mode</span></button><span class="fnav-arrow">›</span></div>
+  <div class="fnav-item"><button class="fnav-btn" onclick="goTo(4)"><span class="fnav-num">05</span><span class="fnav-lbl">Mood</span></button><span class="fnav-arrow">›</span></div>
+  <div class="fnav-item"><button class="fnav-btn" onclick="goTo(5)"><span class="fnav-num">06</span><span class="fnav-lbl">Navigation</span></button></div>
+</div>
+
+<div class="progress-dots">
+  <div class="pdot-nav on" onclick="goTo(0)"></div>
+  <div class="pdot-nav" onclick="goTo(1)"></div>
+  <div class="pdot-nav" onclick="goTo(2)"></div>
+  <div class="pdot-nav" onclick="goTo(3)"></div>
+  <div class="pdot-nav" onclick="goTo(4)"></div>
+  <div class="pdot-nav" onclick="goTo(5)"></div>
+</div>
+
+<div class="screen-area">
+  <div class="device-frame">
+    <div class="device" id="device">
+
+      <!-- SCREEN 1: PASSCODE -->
+      <div class="screen active" id="s0">
+        <div class="topbar"><span class="tag tag-yellow">Security</span><span class="clock">08:00</span></div>
+        <div class="auth-icon">🔐</div>
+        <div class="auth-title">Enter passcode</div>
+        <div class="auth-sub">Authenticate to unlock your scooter</div>
+        <div class="pin-dots" id="pindots">
+          <div class="pindot" id="pd0"></div>
+          <div class="pindot" id="pd1"></div>
+          <div class="pindot" id="pd2"></div>
+          <div class="pindot" id="pd3"></div>
+        </div>
+        <div class="pin-grid">
+          <div class="pin-btn" onclick="pinTap()">1</div><div class="pin-btn" onclick="pinTap()">2</div><div class="pin-btn" onclick="pinTap()">3</div>
+          <div class="pin-btn" onclick="pinTap()">4</div><div class="pin-btn" onclick="pinTap()">5</div><div class="pin-btn" onclick="pinTap()">6</div>
+          <div class="pin-btn" onclick="pinTap()">7</div><div class="pin-btn" onclick="pinTap()">8</div><div class="pin-btn" onclick="pinTap()">9</div>
+          <div class="pin-btn" style="opacity:0.2"></div><div class="pin-btn" onclick="pinTap()">0</div><div class="pin-btn" onclick="pinClear()" style="color:rgba(255,100,100,0.7);font-size:13px">✕</div>
+        </div>
+        <div style="display:flex;justify-content:center;margin-top:auto">
+          <div class="pill pill-yellow"><div class="pdot pdot-yellow"></div>Scooter locked</div>
+        </div>
+      </div>
+
+      <!-- SCREEN 2: PARKED -->
+      <div class="screen" id="s1">
+        <div class="topbar"><span class="tag tag-teal">Parked</span><span class="clock">08:04</span></div>
+        <div class="park-icon">
+          <div class="park-big">P</div>
+          <div class="park-lbl">Scooter parked</div>
+        </div>
+        <div class="divider"></div>
+        <div class="cols3" style="margin-bottom:10px">
+          <div class="stat ay"><span class="sv">87%</span><span class="sl">Battery</span></div>
+          <div class="stat"><span class="sv">156km</span><span class="sl">Range</span></div>
+          <div class="stat ac"><span class="sv">ON</span><span class="sl">Connected</span></div>
+        </div>
+        <div class="cols2" style="margin-bottom:10px">
+          <div class="stat"><span class="sv" style="font-size:11px">22°C</span><span class="sl">Ambient</span></div>
+          <div class="stat"><span class="sv" style="font-size:11px">28°C</span><span class="sl">Batt temp</span></div>
+        </div>
+        <div class="divider"></div>
+        <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px">
+          <div class="pill pill-teal"><div class="pdot pdot-teal"></div>Bluetooth connected</div>
+          <div class="pill pill-yellow">Wi-Fi ready</div>
+        </div>
+        <div style="background:rgba(212,240,110,0.05);border:1px solid rgba(212,240,110,0.15);border-radius:10px;padding:10px 12px;margin-top:auto">
+          <div style="font-size:11px;color:var(--accent);font-family:'DM Sans',sans-serif;margin-bottom:4px;font-weight:500">OTA Update available</div>
+          <div style="font-size:10px;color:rgba(255,255,255,0.35);font-family:'DM Sans',sans-serif">v2.4.1 · 45MB · Install when ready</div>
+        </div>
+      </div>
+
+      <!-- SCREEN 3: RIDING -->
+      <div class="screen" id="s2">
+        <div class="topbar"><span class="tag tag-yellow">Eclipse · Sport</span><span class="clock">09:15</span></div>
+        <div style="text-align:center;margin:8px 0 4px">
+          <div class="speed-big" style="color:var(--accent)">68</div>
+          <div class="speed-unit">km/h</div>
+        </div>
+        <div class="prog-track"><div class="prog-fill prog-yellow" style="--w:56%"></div></div>
+        <div class="cols3" style="margin:10px 0">
+          <div class="stat ay"><span class="sv">82%</span><span class="sl">Battery</span></div>
+          <div class="stat"><span class="sv">148km</span><span class="sl">Range</span></div>
+          <div class="stat"><span class="sv">Sport</span><span class="sl">Mode</span></div>
+        </div>
+        <div class="divider"></div>
+        <div class="cols3" style="margin-bottom:10px">
+          <div class="stat"><span class="sv" style="font-size:11px">24°C</span><span class="sl">Temp</span></div>
+          <div class="stat"><span class="sv" style="font-size:11px">3.2h</span><span class="sl">Trip time</span></div>
+          <div class="stat"><span class="sv" style="font-size:11px">47km</span><span class="sl">Trip dist</span></div>
+        </div>
+        <div class="bars">
+          <div class="bar" style="--d:0s;--h:8px"></div>
+          <div class="bar" style="--d:.12s;--h:14px"></div>
+          <div class="bar" style="--d:.24s;--h:20px"></div>
+          <div class="bar" style="--d:.36s;--h:14px"></div>
+          <div class="bar" style="--d:.48s;--h:8px"></div>
+        </div>
+        <div style="display:flex;justify-content:center;margin-top:auto">
+          <div class="pill pill-yellow"><div class="pdot pdot-yellow"></div>Riding active</div>
+        </div>
+      </div>
+
+      <!-- SCREEN 4: RIDE MODE -->
+      <div class="screen" id="s3">
+        <div class="topbar"><span class="tag tag-teal">Ride Mode</span><span class="clock">09:18</span></div>
+        <div style="font-family:'Syne',sans-serif;font-size:0.82rem;font-weight:700;color:rgba(245,242,236,0.4);margin-bottom:10px">Select ride mode</div>
+        <div class="mode-grid">
+          <div class="mode-card eco" onclick="selectMode(this,'eco')">
+            <div class="mode-icon">🌿</div>
+            <span class="mode-name eco">Eco</span>
+            <div class="mode-desc">Max range · Smooth</div>
+            <div class="mode-bar eco"></div>
+          </div>
+          <div class="mode-card normal" onclick="selectMode(this,'normal')">
+            <div class="mode-icon">⚡</div>
+            <span class="mode-name normal">Normal</span>
+            <div class="mode-desc">Balanced · Daily</div>
+            <div class="mode-bar normal"></div>
+          </div>
+          <div class="mode-card sport selected" onclick="selectMode(this,'sport')">
+            <div class="mode-icon">🏎</div>
+            <span class="mode-name sport">Sport</span>
+            <div class="mode-desc">Performance · Fast</div>
+            <div class="mode-bar sport"></div>
+          </div>
+          <div class="mode-card hyper" onclick="selectMode(this,'hyper')">
+            <div class="mode-icon">🔥</div>
+            <span class="mode-name hyper">Hyper</span>
+            <div class="mode-desc">Max power · Racing</div>
+            <div class="mode-bar hyper"></div>
+          </div>
+        </div>
+        <div class="divider"></div>
+        <div id="modeInfo" style="background:rgba(212,240,110,0.05);border:1px solid rgba(212,240,110,0.15);border-radius:10px;padding:10px 12px;margin-top:auto">
+          <div style="font-size:11px;color:var(--accent);font-family:'Syne',sans-serif;font-weight:700;margin-bottom:4px">Sport mode active</div>
+          <div style="font-size:10px;color:rgba(255,255,255,0.4);font-family:'DM Sans',sans-serif">High performance · Reduced range · Best acceleration</div>
+        </div>
+      </div>
+
+      <!-- SCREEN 5: MOOD -->
+      <div class="screen" id="s4">
+        <div class="topbar"><span class="tag tag-teal">Mood & Theme</span><span class="clock">09:22</span></div>
+        <div style="font-family:'Syne',sans-serif;font-size:0.82rem;font-weight:700;color:rgba(245,242,236,0.4);margin-bottom:10px">Select riding mood</div>
+        <div class="mood-grid">
+          <div class="mood-card eclipse selected" onclick="selectMood(this,'eclipse')">
+            <span class="mood-name eclipse">Eclipse</span>
+            <div class="mood-sub">Dark · Minimal</div>
+            <div class="mood-bar eclipse"></div>
+          </div>
+          <div class="mood-card bolt" onclick="selectMood(this,'bolt')">
+            <span class="mood-name bolt">Bolt</span>
+            <div class="mood-sub">Electric · Vivid</div>
+            <div class="mood-bar bolt"></div>
+          </div>
+          <div class="mood-card care" onclick="selectMood(this,'care')">
+            <span class="mood-name care">Care</span>
+            <div class="mood-sub">Warm · Gentle</div>
+            <div class="mood-bar care"></div>
+          </div>
+          <div class="mood-card vintage" onclick="selectMood(this,'vintage')">
+            <span class="mood-name vintage">Vintage</span>
+            <div class="mood-sub">Retro · Classic</div>
+            <div class="mood-bar vintage"></div>
+          </div>
+          <div class="mood-card bharat bharat-full" onclick="selectMood(this,'bharat')">
+            <span class="mood-name bharat">Bharat Mode</span>
+            <div class="mood-sub">Made for India · Bold · Vibrant</div>
+            <div class="mood-bar bharat"></div>
+          </div>
+        </div>
+        <div class="divider"></div>
+        <div class="theme-row">
+          <span style="font-size:11px;color:rgba(255,255,255,0.3);font-family:'DM Sans',sans-serif">Display theme</span>
+          <div class="theme-btns">
+            <div class="theme-opt off" onclick="setTheme(this,'light')">Light</div>
+            <div class="theme-opt on" onclick="setTheme(this,'dark')">Dark</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- SCREEN 6: NAVIGATION -->
+      <div class="screen" id="s5">
+        <div class="topbar"><span class="tag tag-teal">Navigation</span><span class="clock">11:48</span></div>
+        <div class="map-area">
+          <svg width="100%" height="100%" viewBox="0 0 300 120">
+            <line x1="20" y1="100" x2="100" y2="100" stroke="rgba(255,255,255,0.06)" stroke-width="10" stroke-linecap="round"/>
+            <line x1="100" y1="100" x2="100" y2="45" stroke="rgba(255,255,255,0.06)" stroke-width="10" stroke-linecap="round"/>
+            <line x1="100" y1="45" x2="260" y2="45" stroke="rgba(255,255,255,0.06)" stroke-width="10" stroke-linecap="round"/>
+            <line x1="20" y1="100" x2="100" y2="100" stroke="#6efadb" stroke-width="3" stroke-linecap="round"/>
+            <line x1="100" y1="100" x2="100" y2="45" stroke="#6efadb" stroke-width="3" stroke-linecap="round"/>
+            <line x1="100" y1="45" x2="190" y2="45" stroke="#6efadb" stroke-width="3" stroke-linecap="round"/>
+            <line x1="190" y1="45" x2="260" y2="45" stroke="rgba(110,250,219,0.25)" stroke-width="3" stroke-linecap="round" stroke-dasharray="5 5"/>
+            <circle cx="28" cy="100" r="6" fill="#d4f06e"/>
+            <circle cx="28" cy="100" r="12" fill="none" stroke="#d4f06e" stroke-width="1.5" opacity="0.3"/>
+            <circle cx="255" cy="45" r="6" fill="#6efadb"/>
+          </svg>
+        </div>
+        <div class="nav-dir">
+          <div class="turn">↑</div>
+          <div>
+            <div style="font-size:13px;font-weight:600;color:#fff;font-family:'DM Sans',sans-serif">Continue on MG Road</div>
+            <div style="font-size:11px;color:rgba(255,255,255,0.35);font-family:'DM Sans',sans-serif">Turn right in 400m</div>
+          </div>
+        </div>
+        <div class="cols3" style="margin-bottom:10px">
+          <div class="stat ac"><span class="sv">2.4km</span><span class="sl">Distance</span></div>
+          <div class="stat"><span class="sv">8 min</span><span class="sl">ETA</span></div>
+          <div class="stat"><span class="sv">64%</span><span class="sl">Battery</span></div>
+        </div>
+        <div class="prog-track"><div class="prog-fill prog-teal" style="--w:40%"></div></div>
+        <div style="display:flex;justify-content:center;margin-top:auto">
+          <div class="pill pill-teal"><div class="pdot pdot-teal"></div>Route active</div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- INFO PANEL -->
+  <div class="screen-info" id="infoPanel">
+    <div class="section-label" id="infoLabel">Screen 1 of 6</div>
+    <h2 id="infoTitle">Rider authentication</h2>
+    <p id="infoDesc">Secure passcode-based login designed for quick outdoor authentication. Large tap targets, high contrast, and minimal input steps reduce unlock time while maintaining vehicle security.</p>
+    <div class="info-tags" id="infoTags">
+      <div class="info-tag">Security</div>
+      <div class="info-tag">Passcode UI</div>
+      <div class="info-tag">Access control</div>
+    </div>
+    <div class="nav-btns">
+      <button class="nav-btn btn-prev" id="prevBtn" onclick="goTo(current-1)" style="display:none">&larr; Previous</button>
+      <button class="nav-btn btn-next" id="nextBtn" onclick="goTo(current+1)">Next screen &rarr;</button>
+    </div>
+  </div>
+</div>
+
+<footer>
+  <span>© 2025 Sanjutha R · Ola Electric HMI</span>
+  <a href="index.html" style="color:rgba(212,240,110,0.6);text-decoration:none;font-size:0.8rem">&larr; Back to portfolio</a>
+</footer>
+
+<script>
+let current = 0;
+let pinCount = 0;
+
+const data = [
+  {label:'Screen 1 of 6',title:'Rider authentication',desc:'Secure passcode-based login designed for quick outdoor authentication. Large tap targets, high contrast, and minimal steps reduce unlock time while maintaining full vehicle security.',tags:['Security','Passcode UI','Access control','Outdoor readability'],border:'rgba(212,240,110,0.15)'},
+  {label:'Screen 2 of 6',title:'Parked state',desc:'The scooter\'s resting state — showing battery health, connectivity status, range estimate, and OTA update notifications. Designed to be informative at a glance without unnecessary complexity.',tags:['Parked UI','OTA updates','Connectivity','Battery status'],border:'rgba(110,250,219,0.1)'},
+  {label:'Screen 3 of 6',title:'Riding dashboard',desc:'Adaptive real-time dashboard showing speed, battery, range and trip stats. The layout prioritizes speed readability at the centre while keeping critical info visible in the peripheral zone.',tags:['Real-time data','Speed display','Trip stats','Safety-first'],border:'rgba(212,240,110,0.15)'},
+  {label:'Screen 4 of 6',title:'Ride mode selection',desc:'Four distinct riding modes — Eco, Normal, Sport and Hyper — each tuned for different rider priorities. Tap to switch; the system updates power, throttle and range estimates instantly.',tags:['Eco','Normal','Sport','Hyper','Mode switching'],border:'rgba(110,250,219,0.1)'},
+  {label:'Screen 5 of 6',title:'Mood & theme system',desc:'Five riding moods (Eclipse, Bolt, Care, Vintage, Bharat) each transforming the visual character of the dashboard — colour, typography weight, and accent system — while preserving safety hierarchy.',tags:['Eclipse','Bolt','Care','Vintage','Bharat Mode','Themes'],border:'rgba(110,250,219,0.1)'},
+  {label:'Screen 6 of 6',title:'Navigation experience',desc:'Turn-by-turn navigation embedded directly in the dashboard. Large directional cues, simplified route rendering, and high-contrast guidance minimize distraction and support safe glance-based reading.',tags:['Navigation','Turn-by-turn','Route display','Glanceability'],border:'rgba(110,250,219,0.1)'}
+];
+
+function goTo(n) {
+  if (n < 0 || n > 5) return;
+  document.getElementById('s'+current).classList.remove('active');
+  document.querySelectorAll('.fnav-btn')[current].classList.remove('active');
+  document.querySelectorAll('.pdot-nav')[current].classList.remove('on');
+  current = n;
+  document.getElementById('s'+current).classList.add('active');
+  document.querySelectorAll('.fnav-btn')[current].classList.add('active');
+  document.querySelectorAll('.pdot-nav')[current].classList.add('on');
+  const d = data[current];
+  document.getElementById('infoLabel').textContent = d.label;
+  document.getElementById('infoTitle').textContent = d.title;
+  document.getElementById('infoDesc').textContent = d.desc;
+  document.getElementById('device').style.borderColor = d.border;
+  const tagsEl = document.getElementById('infoTags');
+  tagsEl.innerHTML = d.tags.map(t=>`<div class="info-tag">${t}</div>`).join('');
+  document.getElementById('prevBtn').style.display = current === 0 ? 'none' : 'inline-flex';
+  document.getElementById('nextBtn').style.display = current === 5 ? 'none' : 'inline-flex';
+}
+
+function pinTap() {
+  if (pinCount >= 4) return;
+  document.getElementById('pd'+pinCount).classList.add('on');
+  pinCount++;
+  if (pinCount === 4) {
+    setTimeout(() => { goTo(1); pinCount = 0; ['pd0','pd1','pd2','pd3'].forEach(id=>document.getElementById(id).classList.remove('on')); }, 600);
+  }
+}
+function pinClear() {
+  if (pinCount > 0) { pinCount--; document.getElementById('pd'+pinCount).classList.remove('on'); }
+}
+
+const modeInfo = {
+  eco: {color:'rgba(100,200,100,0.15)',border:'rgba(100,200,100,0.3)',title:'Eco mode active',desc:'Maximum range · Gentle throttle · Best for city commutes'},
+  normal: {color:'rgba(110,250,219,0.08)',border:'rgba(110,250,219,0.25)',title:'Normal mode active',desc:'Balanced performance · Good range · Everyday riding'},
+  sport: {color:'rgba(212,240,110,0.08)',border:'rgba(212,240,110,0.2)',title:'Sport mode active',desc:'High performance · Reduced range · Best acceleration'},
+  hyper: {color:'rgba(255,100,80,0.1)',border:'rgba(255,100,80,0.3)',title:'Hyper mode active',desc:'Maximum power · Racing response · Limited to track use'}
+};
+function selectMode(el, mode) {
+  document.querySelectorAll('.mode-card').forEach(c=>c.classList.remove('selected'));
+  el.classList.add('selected');
+  const mi = modeInfo[mode];
+  const box = document.getElementById('modeInfo');
+  box.style.background = mi.color;
+  box.style.borderColor = mi.border;
+  box.children[0].textContent = mi.title;
+  box.children[1].textContent = mi.desc;
+  const col = el.querySelector('.mode-name').className.replace('mode-name ','');
+  box.children[0].style.color = getComputedStyle(el.querySelector('.mode-name')).color;
+}
+
+function selectMood(el, mood) {
+  document.querySelectorAll('.mood-card').forEach(c=>c.classList.remove('selected'));
+  el.classList.add('selected');
+}
+function setTheme(el, t) {
+  document.querySelectorAll('.theme-opt').forEach(b=>{ b.classList.remove('on'); b.classList.add('off'); });
+  el.classList.remove('off'); el.classList.add('on');
+}
+
+goTo(0);
+</script>
+</body>
+</html>
