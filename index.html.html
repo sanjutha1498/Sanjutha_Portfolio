@@ -1,0 +1,705 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sanjutha R — Automotive HMI Designer</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --black: #0a0a0a;
+    --white: #f5f2ec;
+    --accent: #d4f06e;
+    --accent2: #6efadb;
+    --mid: #1a1a1a;
+    --muted: #555;
+    --border: rgba(255,255,255,0.08);
+    --card: #111;
+  }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--black);
+    color: var(--white);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 16px;
+    line-height: 1.7;
+    overflow-x: hidden;
+  }
+
+  /* ---- NAV ---- */
+  nav {
+    position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 1.25rem 4rem;
+    background: rgba(10,10,10,0.85);
+    backdrop-filter: blur(12px);
+    border-bottom: 1px solid var(--border);
+  }
+  .nav-logo {
+    font-family: 'Syne', sans-serif;
+    font-weight: 800;
+    font-size: 1.1rem;
+    letter-spacing: -0.02em;
+    color: var(--white);
+    text-decoration: none;
+  }
+  .nav-logo span { color: var(--accent); }
+  .nav-links { display: flex; gap: 2.5rem; list-style: none; }
+  .nav-links a {
+    color: rgba(245,242,236,0.6);
+    text-decoration: none;
+    font-size: 0.85rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    font-weight: 500;
+    transition: color 0.2s;
+  }
+  .nav-links a:hover { color: var(--accent); }
+
+  /* ---- HERO ---- */
+  #hero {
+    min-height: 100vh;
+    display: flex; align-items: center;
+    padding: 8rem 4rem 4rem;
+    position: relative;
+    overflow: hidden;
+  }
+  .hero-bg {
+    position: absolute; inset: 0; z-index: 0;
+    background: radial-gradient(ellipse 80% 60% at 70% 50%, rgba(212,240,110,0.06) 0%, transparent 70%),
+                radial-gradient(ellipse 50% 40% at 20% 80%, rgba(110,250,219,0.04) 0%, transparent 60%);
+  }
+  .hero-grid {
+    position: absolute; inset: 0; z-index: 0;
+    background-image: linear-gradient(rgba(255,255,255,0.02) 1px, transparent 1px),
+                      linear-gradient(90deg, rgba(255,255,255,0.02) 1px, transparent 1px);
+    background-size: 60px 60px;
+  }
+  .hero-content { position: relative; z-index: 1; max-width: 900px; }
+  .hero-tag {
+    display: inline-flex; align-items: center; gap: 8px;
+    background: rgba(212,240,110,0.1);
+    border: 1px solid rgba(212,240,110,0.25);
+    border-radius: 100px;
+    padding: 6px 16px;
+    font-size: 0.78rem;
+    font-weight: 500;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 2rem;
+    animation: fadeUp 0.6s ease both;
+  }
+  .hero-tag::before {
+    content: '';
+    width: 6px; height: 6px;
+    background: var(--accent);
+    border-radius: 50%;
+  }
+  h1 {
+    font-family: 'Syne', sans-serif;
+    font-size: clamp(3rem, 7vw, 6rem);
+    font-weight: 800;
+    line-height: 1;
+    letter-spacing: -0.04em;
+    animation: fadeUp 0.6s 0.1s ease both;
+  }
+  h1 .line2 { display: block; color: rgba(245,242,236,0.25); }
+  .hero-sub {
+    margin-top: 2rem;
+    max-width: 520px;
+    font-size: 1.05rem;
+    color: rgba(245,242,236,0.6);
+    font-weight: 300;
+    line-height: 1.8;
+    animation: fadeUp 0.6s 0.2s ease both;
+  }
+  .hero-ctas {
+    display: flex; gap: 1rem; margin-top: 2.5rem; flex-wrap: wrap;
+    animation: fadeUp 0.6s 0.3s ease both;
+  }
+  .btn {
+    display: inline-flex; align-items: center; gap: 8px;
+    padding: 0.9rem 2rem;
+    border-radius: 100px;
+    font-size: 0.9rem;
+    font-weight: 500;
+    text-decoration: none;
+    transition: all 0.25s;
+    cursor: pointer;
+  }
+  .btn-primary {
+    background: var(--accent);
+    color: var(--black);
+    border: none;
+  }
+  .btn-primary:hover { background: #c8e860; transform: translateY(-2px); }
+  .btn-outline {
+    background: transparent;
+    color: var(--white);
+    border: 1px solid rgba(255,255,255,0.2);
+  }
+  .btn-outline:hover { border-color: var(--accent); color: var(--accent); transform: translateY(-2px); }
+
+  .hero-stats {
+    display: flex; gap: 3rem; margin-top: 4rem;
+    border-top: 1px solid var(--border); padding-top: 2.5rem;
+    animation: fadeUp 0.6s 0.4s ease both;
+  }
+  .stat-num {
+    font-family: 'Syne', sans-serif;
+    font-size: 2rem;
+    font-weight: 700;
+    color: var(--accent);
+  }
+  .stat-label {
+    font-size: 0.78rem;
+    color: rgba(245,242,236,0.45);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    margin-top: 2px;
+  }
+
+  /* ---- SECTIONS ---- */
+  section { padding: 6rem 4rem; }
+  .section-label {
+    font-size: 0.72rem;
+    font-weight: 500;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 1rem;
+  }
+  h2 {
+    font-family: 'Syne', sans-serif;
+    font-size: clamp(2rem, 4vw, 3.2rem);
+    font-weight: 700;
+    letter-spacing: -0.03em;
+    line-height: 1.1;
+  }
+
+  /* ---- ABOUT ---- */
+  #about { background: var(--mid); }
+  .about-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 6rem; margin-top: 3.5rem;
+    align-items: start;
+  }
+  .about-text p {
+    color: rgba(245,242,236,0.65);
+    font-weight: 300;
+    font-size: 1.05rem;
+    margin-bottom: 1.2rem;
+  }
+  .skills-grid {
+    display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem;
+    margin-top: 2rem;
+  }
+  .skill-chip {
+    background: rgba(212,240,110,0.07);
+    border: 1px solid rgba(212,240,110,0.15);
+    border-radius: 8px;
+    padding: 0.6rem 1rem;
+    font-size: 0.82rem;
+    color: rgba(245,242,236,0.75);
+    font-weight: 400;
+  }
+  .about-highlights { display: flex; flex-direction: column; gap: 1.25rem; }
+  .highlight-card {
+    background: rgba(255,255,255,0.03);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 1.5rem;
+    transition: border-color 0.2s, background 0.2s;
+  }
+  .highlight-card:hover {
+    border-color: rgba(212,240,110,0.2);
+    background: rgba(212,240,110,0.03);
+  }
+  .highlight-icon {
+    font-size: 1.5rem; margin-bottom: 0.5rem;
+  }
+  .highlight-card h4 {
+    font-family: 'Syne', sans-serif;
+    font-size: 1rem; font-weight: 600;
+    margin-bottom: 0.3rem;
+  }
+  .highlight-card p {
+    font-size: 0.84rem;
+    color: rgba(245,242,236,0.5);
+    line-height: 1.6;
+  }
+
+  /* ---- WORK ---- */
+  #work { background: var(--black); }
+  .project-card {
+    margin-top: 3rem;
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 24px;
+    overflow: hidden;
+    transition: border-color 0.25s;
+  }
+  .project-card:hover { border-color: rgba(212,240,110,0.25); }
+  .project-header {
+    padding: 2.5rem 3rem;
+    border-bottom: 1px solid var(--border);
+    display: flex; align-items: start; justify-content: space-between; gap: 2rem;
+  }
+  .project-meta { flex: 1; }
+  .project-tag {
+    display: inline-block;
+    background: rgba(110,250,219,0.1);
+    border: 1px solid rgba(110,250,219,0.2);
+    color: var(--accent2);
+    font-size: 0.72rem;
+    font-weight: 500;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    padding: 4px 12px;
+    border-radius: 100px;
+    margin-bottom: 1rem;
+  }
+  .project-title {
+    font-family: 'Syne', sans-serif;
+    font-size: 1.9rem;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    line-height: 1.2;
+    margin-bottom: 0.75rem;
+  }
+  .project-desc {
+    color: rgba(245,242,236,0.55);
+    font-size: 0.95rem;
+    max-width: 520px;
+    font-weight: 300;
+  }
+  .project-role {
+    background: rgba(255,255,255,0.04);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 1.25rem 1.5rem;
+    min-width: 200px;
+    text-align: center;
+  }
+  .project-role-label { font-size: 0.72rem; color: rgba(245,242,236,0.35); text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 0.4rem; }
+  .project-role-val { font-family: 'Syne', sans-serif; font-size: 0.95rem; font-weight: 600; }
+
+  .project-body { padding: 2.5rem 3rem; }
+  .features-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+    gap: 1rem; margin-bottom: 2.5rem;
+  }
+  .feature-item {
+    background: rgba(255,255,255,0.025);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 1rem 1.25rem;
+    display: flex; align-items: start; gap: 0.75rem;
+  }
+  .feature-dot {
+    width: 6px; height: 6px;
+    background: var(--accent);
+    border-radius: 50%;
+    flex-shrink: 0;
+    margin-top: 8px;
+  }
+  .feature-item span { font-size: 0.85rem; color: rgba(245,242,236,0.65); line-height: 1.5; }
+
+  .impact-row {
+    display: flex; gap: 1.5rem; flex-wrap: wrap;
+    background: rgba(212,240,110,0.04);
+    border: 1px solid rgba(212,240,110,0.12);
+    border-radius: 16px;
+    padding: 1.75rem 2rem;
+  }
+  .impact-item { flex: 1; min-width: 160px; }
+  .impact-item h5 {
+    font-family: 'Syne', sans-serif;
+    font-size: 1.1rem; font-weight: 700;
+    color: var(--accent); margin-bottom: 0.25rem;
+  }
+  .impact-item p { font-size: 0.8rem; color: rgba(245,242,236,0.5); }
+
+  .sections-list { margin-top: 2rem; }
+  .section-block {
+    border-top: 1px solid var(--border);
+    padding: 1.5rem 0;
+    display: grid;
+    grid-template-columns: 200px 1fr;
+    gap: 2rem;
+    align-start: start;
+  }
+  .section-block h4 {
+    font-family: 'Syne', sans-serif;
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: rgba(245,242,236,0.4);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    padding-top: 2px;
+  }
+  .section-block p {
+    font-size: 0.9rem;
+    color: rgba(245,242,236,0.6);
+    font-weight: 300;
+    line-height: 1.7;
+  }
+
+  /* ---- RESUME ---- */
+  #resume { background: var(--mid); }
+  .resume-grid {
+    display: grid; grid-template-columns: 1fr 1fr; gap: 4rem;
+    margin-top: 3.5rem;
+  }
+  .resume-block h3 {
+    font-family: 'Syne', sans-serif;
+    font-size: 1.1rem; font-weight: 700;
+    margin-bottom: 1.5rem;
+    padding-bottom: 0.75rem;
+    border-bottom: 1px solid var(--border);
+    color: var(--accent);
+  }
+  .resume-item { margin-bottom: 1.5rem; }
+  .resume-item-header {
+    font-weight: 500; font-size: 0.95rem;
+    margin-bottom: 0.25rem;
+  }
+  .resume-item-sub {
+    font-size: 0.82rem; color: rgba(245,242,236,0.45);
+    margin-bottom: 0.4rem;
+  }
+  .resume-item p { font-size: 0.88rem; color: rgba(245,242,236,0.6); font-weight: 300; }
+
+  .skills-list { display: flex; flex-direction: column; gap: 0.75rem; }
+  .skill-row { display: flex; align-items: center; gap: 1rem; }
+  .skill-name { font-size: 0.85rem; min-width: 160px; color: rgba(245,242,236,0.7); }
+  .skill-bar {
+    flex: 1; height: 3px;
+    background: rgba(255,255,255,0.08);
+    border-radius: 100px; overflow: hidden;
+  }
+  .skill-bar-fill {
+    height: 100%;
+    background: var(--accent);
+    border-radius: 100px;
+    transform-origin: left;
+    animation: barGrow 1s ease both;
+  }
+
+  /* ---- CONTACT ---- */
+  #contact { background: var(--black); text-align: center; }
+  #contact h2 { margin-bottom: 1rem; }
+  #contact p { color: rgba(245,242,236,0.5); max-width: 440px; margin: 0 auto 2.5rem; font-weight: 300; }
+  .contact-links {
+    display: flex; justify-content: center; gap: 1rem; flex-wrap: wrap;
+    margin-bottom: 2rem;
+  }
+
+  /* ---- FOOTER ---- */
+  footer {
+    padding: 2rem 4rem;
+    border-top: 1px solid var(--border);
+    display: flex; justify-content: space-between; align-items: center;
+    font-size: 0.8rem;
+    color: rgba(245,242,236,0.25);
+  }
+
+  /* ---- ANIMATIONS ---- */
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  @keyframes barGrow {
+    from { width: 0; } to { width: 100%; }
+  }
+
+  /* ---- RESPONSIVE ---- */
+  @media (max-width: 900px) {
+    nav { padding: 1rem 2rem; }
+    section, #hero { padding-left: 2rem; padding-right: 2rem; }
+    .about-grid, .resume-grid { grid-template-columns: 1fr; gap: 3rem; }
+    .section-block { grid-template-columns: 1fr; gap: 0.5rem; }
+    .project-header { flex-direction: column; }
+    .hero-stats { gap: 2rem; flex-wrap: wrap; }
+    .nav-links { display: none; }
+    footer { flex-direction: column; gap: 0.5rem; text-align: center; }
+  }
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <a href="#hero" class="nav-logo">S<span>.</span>R</a>
+  <ul class="nav-links">
+    <li><a href="#about">About</a></li>
+    <li><a href="#work">Work</a></li>
+    <li><a href="#resume">Resume</a></li>
+    <li><a href="#contact">Contact</a></li>
+  </ul>
+  <a href="mailto:sanjuthajosephine@gmail.com" class="btn btn-primary" style="padding:0.6rem 1.4rem;font-size:0.82rem;">Hire me</a>
+</nav>
+
+<!-- HERO -->
+<section id="hero">
+  <div class="hero-bg"></div>
+  <div class="hero-grid"></div>
+  <div class="hero-content">
+    <div class="hero-tag">Available for opportunities</div>
+    <h1>
+      Sanjutha R
+      <span class="line2">HMI Designer</span>
+    </h1>
+    <p class="hero-sub">
+      Automotive HMI Designer specializing in Kanzi. Crafting real-time digital dashboards for EVs — focused on safety, clarity, and performance at every glance.
+    </p>
+    <div class="hero-ctas">
+      <a href="#work" class="btn btn-primary">View my work &darr;</a>
+      <a href="https://acrobat.adobe.com/id/urn:aaid:sc:AP:680409c7-c445-4832-a368-7a1c20d4db58" target="_blank" class="btn btn-outline">Download resume</a>
+    </div>
+    <div class="hero-stats">
+      <div>
+        <div class="stat-num">4+</div>
+        <div class="stat-label">Years experience</div>
+      </div>
+      <div>
+        <div class="stat-num">3.5</div>
+        <div class="stat-label">Years Kanzi</div>
+      </div>
+      <div>
+        <div class="stat-num">OLA</div>
+        <div class="stat-label">Electric scooters</div>
+      </div>
+      <div>
+        <div class="stat-num">EV</div>
+        <div class="stat-label">Digital clusters</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ABOUT -->
+<section id="about">
+  <div class="section-label">About me</div>
+  <h2>Engineering interfaces<br>riders trust at speed</h2>
+  <div class="about-grid">
+    <div class="about-text">
+      <p>
+        I'm an Automotive HMI Designer with 4+ years of experience building real-time embedded vehicle interfaces. I specialize in EV digital instrument clusters and Kanzi-based HMI systems, transforming complex vehicle data into intuitive, safety-driven user experiences.
+      </p>
+      <p>
+        My work lives at the intersection of engineering constraints and rider psychology — every pixel is designed to communicate critical information in under a glance.
+      </p>
+      <div class="skills-grid">
+        <div class="skill-chip">Automotive HMI Design</div>
+        <div class="skill-chip">Kanzi Development</div>
+        <div class="skill-chip">Instrument Cluster Systems</div>
+        <div class="skill-chip">Interaction Design</div>
+        <div class="skill-chip">UX Research & User Flows</div>
+        <div class="skill-chip">Embedded UI Systems</div>
+        <div class="skill-chip">Wireframing & Prototyping</div>
+        <div class="skill-chip">ADAS Safety Feedback</div>
+      </div>
+    </div>
+    <div class="about-highlights">
+      <div class="highlight-card">
+        <div class="highlight-icon">⚡</div>
+        <h4>Real-time EV systems</h4>
+        <p>Designed end-to-end instrument cluster for Ola Electric — from authentication flows to ADAS alerts deployed on production vehicles.</p>
+      </div>
+      <div class="highlight-card">
+        <div class="highlight-icon">🎨</div>
+        <h4>Rider personalization</h4>
+        <p>Created multiple riding Mood themes (Eclipse, Care, Bolt, Vintage, Bharat Mode) with adaptive light/dark systems and full localization support.</p>
+      </div>
+      <div class="highlight-card">
+        <div class="highlight-icon">🛡</div>
+        <h4>Safety-first design</h4>
+        <p>Specialized in minimal-distraction UI: large visual hierarchy, quick-access patterns, and ADAS safety notifications with glance-based comprehension.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- WORK -->
+<section id="work">
+  <div class="section-label">Featured project</div>
+  <h2>Ola Electric Scooter<br>HMI System</h2>
+
+  <div class="project-card">
+    <div class="project-header">
+      <div class="project-meta">
+        <div class="project-tag">Kanzi · Embedded · EV</div>
+        <div class="project-title">Automotive HMI Design<br>— Complete System</div>
+        <p class="project-desc">End-to-end in-vehicle digital dashboard system for Ola Electric scooters — designed for production deployment with safety, clarity and real-time riding feedback at its core.</p>
+      </div>
+      <div class="project-role">
+        <div class="project-role-label">My role</div>
+        <div class="project-role-val">HMI Designer</div>
+        <div style="margin-top:0.75rem; font-size:0.78rem; color:rgba(245,242,236,0.35);">Kanzi Development</div>
+      </div>
+    </div>
+
+    <div class="project-body">
+      <p style="font-size:0.9rem;color:rgba(245,242,236,0.5);margin-bottom:1.5rem;font-weight:300;">Key features delivered</p>
+      <div class="features-grid">
+        <div class="feature-item"><div class="feature-dot"></div><span>Secure passcode-based rider authentication</span></div>
+        <div class="feature-item"><div class="feature-dot"></div><span>Real-time speed, battery & range dashboard</span></div>
+        <div class="feature-item"><div class="feature-dot"></div><span>5 riding Moods with full visual theming</span></div>
+        <div class="feature-item"><div class="feature-dot"></div><span>Light & Dark theme personalization</span></div>
+        <div class="feature-item"><div class="feature-dot"></div><span>Turn-by-turn glanceable navigation</span></div>
+        <div class="feature-item"><div class="feature-dot"></div><span>Smart charging with real-time battery progress</span></div>
+        <div class="feature-item"><div class="feature-dot"></div><span>Bluetooth call alerts & device pairing</span></div>
+        <div class="feature-item"><div class="feature-dot"></div><span>OTA over-the-air software update flows</span></div>
+        <div class="feature-item"><div class="feature-dot"></div><span>Multi-language localization across all modules</span></div>
+        <div class="feature-item"><div class="feature-dot"></div><span>ADAS alerts with high-contrast visual feedback</span></div>
+        <div class="feature-item"><div class="feature-dot"></div><span>Vlog Mode for simplified ride capture</span></div>
+        <div class="feature-item"><div class="feature-dot"></div><span>Modular Kanzi .kzb rendering architecture</span></div>
+      </div>
+
+      <div class="impact-row">
+        <div class="impact-item">
+          <h5>↑ Glanceability</h5>
+          <p>Improved readability during motion</p>
+        </div>
+        <div class="impact-item">
+          <h5>↓ Tap count</h5>
+          <p>Reduced interaction steps for key tasks</p>
+        </div>
+        <div class="impact-item">
+          <h5>Production</h5>
+          <p>UI deployed on actual vehicles</p>
+        </div>
+        <div class="impact-item">
+          <h5>Multi-release</h5>
+          <p>Supported multiple feature rollouts</p>
+        </div>
+      </div>
+
+      <div class="sections-list">
+        <div class="section-block">
+          <h4>Problem</h4>
+          <p>Build a responsive and distraction-free HMI that delivers real-time riding data, navigation, and vehicle controls while operating within embedded hardware constraints and automotive safety standards.</p>
+        </div>
+        <div class="section-block">
+          <h4>Design approach</h4>
+          <p>Modular, rider-focused HMI system prioritizing glanceability and safety. Clear layouts, large visual elements, and quick-access navigation patterns. Each screen optimized for real-time responsiveness using Kanzi — authentication, dashboard, charging, navigation, personalization and connectivity all reachable within 1–2 taps.</p>
+        </div>
+        <div class="section-block">
+          <h4>Architecture</h4>
+          <p>Layered system integrating vehicle signals with the Android application layer and Kanzi rendering engine. The exported .kzb bundle acts as a dedicated presentation layer with dynamic property bindings — maintaining a clean separation between business logic and visual rendering, ensuring scalability within an embedded automotive environment.</p>
+        </div>
+        <div class="section-block">
+          <h4>Collaboration</h4>
+          <p>Worked closely with firmware, embedded, and vehicle engineering teams to ensure seamless system integration and production readiness across multiple OTA releases.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- RESUME -->
+<section id="resume">
+  <div class="section-label">Resume</div>
+  <h2>Experience & skills</h2>
+  <div class="resume-grid">
+    <div>
+      <div class="resume-block">
+        <h3>Professional snapshot</h3>
+        <div class="resume-item">
+          <div class="resume-item-header">Automotive HMI Designer</div>
+          <div class="resume-item-sub">Ola Electric · 3.5+ years</div>
+          <p>Designed the complete in-vehicle dashboard interface for Ola Electric scooters. Led riding Mood customization systems, scalable UI layouts, reusable components, and end-to-end interaction flows across 2D and 3D Kanzi scenes.</p>
+        </div>
+      </div>
+      <div class="resume-block" style="margin-top:2rem;">
+        <h3>Core competencies</h3>
+        <div class="skills-list">
+          <div class="skill-row">
+            <span class="skill-name">Kanzi Development</span>
+            <div class="skill-bar"><div class="skill-bar-fill" style="width:95%"></div></div>
+          </div>
+          <div class="skill-row">
+            <span class="skill-name">HMI Design</span>
+            <div class="skill-bar"><div class="skill-bar-fill" style="width:95%"></div></div>
+          </div>
+          <div class="skill-row">
+            <span class="skill-name">Instrument Clusters</span>
+            <div class="skill-bar"><div class="skill-bar-fill" style="width:92%"></div></div>
+          </div>
+          <div class="skill-row">
+            <span class="skill-name">Interaction Design</span>
+            <div class="skill-bar"><div class="skill-bar-fill" style="width:88%"></div></div>
+          </div>
+          <div class="skill-row">
+            <span class="skill-name">UX Research</span>
+            <div class="skill-bar"><div class="skill-bar-fill" style="width:82%"></div></div>
+          </div>
+          <div class="skill-row">
+            <span class="skill-name">Embedded UI Systems</span>
+            <div class="skill-bar"><div class="skill-bar-fill" style="width:90%"></div></div>
+          </div>
+          <div class="skill-row">
+            <span class="skill-name">Wireframing & Prototyping</span>
+            <div class="skill-bar"><div class="skill-bar-fill" style="width:86%"></div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div>
+      <div class="resume-block">
+        <h3>Key achievements</h3>
+        <div class="resume-item">
+          <div class="resume-item-header">EV Instrument Cluster — Production</div>
+          <div class="resume-item-sub">Ola Electric Scooters</div>
+          <p>Designed and delivered a complete production-ready instrument cluster system deployed on Ola Electric vehicles, supporting multiple OTA-driven feature rollouts.</p>
+        </div>
+        <div class="resume-item">
+          <div class="resume-item-header">Multi-Mood Theme System</div>
+          <div class="resume-item-sub">Personalization & UX</div>
+          <p>Led the design of 5 distinct riding Mood themes plus Light/Dark mode — balancing visual expressiveness with embedded hardware performance constraints.</p>
+        </div>
+        <div class="resume-item">
+          <div class="resume-item-header">Multi-Language Localization</div>
+          <div class="resume-item-sub">Accessibility</div>
+          <p>Implemented scalable adaptive layouts across all core modules to support multi-language content without breaking visual consistency.</p>
+        </div>
+        <div class="resume-item">
+          <div class="resume-item-header">ADAS Safety Feedback System</div>
+          <div class="resume-item-sub">Safety-critical UX</div>
+          <p>Designed high-contrast, prioritized ADAS alert UI for glance-based comprehension during active riding — minimizing cognitive load and distraction.</p>
+        </div>
+      </div>
+      <a href="https://acrobat.adobe.com/id/urn:aaid:sc:AP:680409c7-c445-4832-a368-7a1c20d4db58" target="_blank" class="btn btn-outline" style="margin-top:1.5rem;display:inline-flex;">View full resume &rarr;</a>
+    </div>
+  </div>
+</section>
+
+<!-- CONTACT -->
+<section id="contact">
+  <div class="section-label">Get in touch</div>
+  <h2>Let's build something<br>that moves people.</h2>
+  <p>Open to automotive HMI, embedded UI, and instrument cluster design opportunities.</p>
+  <div class="contact-links">
+    <a href="mailto:sanjuthajosephine@gmail.com" class="btn btn-primary">sanjuthajosephine@gmail.com</a>
+    <a href="https://www.linkedin.com/in/sanjutha-r-81664a201/" target="_blank" class="btn btn-outline">LinkedIn &rarr;</a>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <span>© 2025 Sanjutha R</span>
+  <span>Automotive HMI Designer · Kanzi Specialist</span>
+</footer>
+
+</body>
+</html>
